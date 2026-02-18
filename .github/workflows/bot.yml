@@ -2,8 +2,10 @@ name: Room Availability Bot
 
 on:
   schedule:
-    # Runs daily at 6:00 AM UTC (11:30 AM IST)
-    - cron: '0 6 * * *'
+    # Runs daily at 1:00 PM IST (7:30 AM UTC)
+    - cron: '30 7 * * *'
+    # Runs daily at 7:00 PM IST (1:30 PM UTC)
+    - cron: '30 13 * * *'
   workflow_dispatch:  # Allow manual trigger from GitHub Actions tab
 
 jobs:
@@ -35,6 +37,7 @@ jobs:
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
           MAK_SPREADSHEET_ID: ${{ secrets.MAK_SPREADSHEET_ID }}
+          WEBSITE_URL: ${{ secrets.WEBSITE_URL }}
         run: python -u mak_ram_test.py
 
   run-madinah-bot:
@@ -66,4 +69,5 @@ jobs:
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
           MED_SPREADSHEET_ID: ${{ secrets.MED_SPREADSHEET_ID }}
+          WEBSITE_URL: ${{ secrets.WEBSITE_URL }}
         run: python -u med_ram_test.py

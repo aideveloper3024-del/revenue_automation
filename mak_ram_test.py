@@ -16,7 +16,7 @@ import gspread
 # ==================== CONFIGURATION ====================
 USERNAME = os.environ.get("BOT_USERNAME", "ai")
 PASSWORD = os.environ.get("BOT_PASSWORD", "")
-WEBSITE_URL = "https://bookingarabian.com/"
+WEBSITE_URL = os.environ.get("WEBSITE_URL", "https://bookingarabian.com/")
 
 CITY = "MAKKAH"
 
