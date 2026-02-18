@@ -30,11 +30,12 @@ jobs:
 
       - name: Run Makkah bot
         env:
+          PYTHONUNBUFFERED: '1'
           BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
           MAK_SPREADSHEET_ID: ${{ secrets.MAK_SPREADSHEET_ID }}
-        run: python mak_ram_test.py
+        run: python -u mak_ram_test.py
 
   run-madinah-bot:
     name: Madinah Room Availability
@@ -60,8 +61,9 @@ jobs:
 
       - name: Run Madinah bot
         env:
+          PYTHONUNBUFFERED: '1'
           BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
           BOT_PASSWORD: ${{ secrets.BOT_PASSWORD }}
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
           MED_SPREADSHEET_ID: ${{ secrets.MED_SPREADSHEET_ID }}
-        run: python med_ram_test.py
+        run: python -u med_ram_test.py
