@@ -1,0 +1,16 @@
+# Google Service Account credentials - NEVER commit this
+credentials.json
+
+# Python
+*.pyc
+__pycache__/
+
+# Error screenshots
+error_screenshot.png
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
