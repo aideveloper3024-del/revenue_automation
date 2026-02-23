@@ -31,7 +31,9 @@ if _creds_json:
 else:
     CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 
-SPREADSHEET_ID = os.environ.get("MED_SPREADSHEET_ID", "1p75saWLhBr7hy57_ylRNiRPIX-zxMLq4HT2MHpk9GjI")
+SPREADSHEET_ID = os.environ.get("MED_SPREADSHEET_ID")
+if not SPREADSHEET_ID:
+    raise ValueError("MED_SPREADSHEET_ID environment variable must be set")
 
 # Hotel mapping: Google Sheet Tab Name -> Website Hotel Name
 HOTEL_MAPPING = {

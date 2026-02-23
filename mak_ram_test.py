@@ -31,7 +31,9 @@ if _creds_json:
 else:
     CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 
-SPREADSHEET_ID = os.environ.get("MAK_SPREADSHEET_ID", "1atO6DNwGYTBKJyxVvOoN8whSBjbrgr4tgpEWmUzceAM")
+SPREADSHEET_ID = os.environ.get("MAK_SPREADSHEET_ID")
+if not SPREADSHEET_ID:
+    raise ValueError("MAK_SPREADSHEET_ID environment variable must be set")
 
 # Hotel mapping: Sheet Name -> Website Hotel Name (EXACT unique identifier)
 # Use unique parts of the hotel name to avoid mismatches
