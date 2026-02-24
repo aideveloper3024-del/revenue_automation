@@ -37,9 +37,9 @@ if not SPREADSHEET_ID:
 
 # Hotel mapping: Google Sheet Tab Name -> Website Hotel Name
 HOTEL_MAPPING = {
-    "Maden Hotel": "Maden Hotel",
     "AMP": "ANWAR",
     "SAJA": "SAJA MADINAH",
+    "MADEN": "Maden Hotel",
     "AL HARAM": "DAR AL EIMAN AL HARAM",
     "PULLMAN": "PULLMAN ZAMZAM MADINAH",
     "AQEEQ ": "AL AQEEQ MADINAH",
