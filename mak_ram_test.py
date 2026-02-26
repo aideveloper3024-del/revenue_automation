@@ -42,6 +42,7 @@ HOTEL_MAPPING = {
     "SWISS MQM": "SWISSOTEL AL MAQAM",         # Al Maqam version
     "HAJAR": "MOVENPICK HAJAR TOWER MAKKAH",
     "SAFWA 3": "SAFWA TOWER 3",                 # Safwa Tower
+    "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
     "MAKKAH TWR ": "MAKKAH TOWER",   # Makkah Tower
     " MARRIOT ": "JABAL OMAR MARRIOTT HOTEL MAKKAH",              # Marriot
     "OLYAN AJY": "AL OLAYAN AJYAD HOTEL",                 # Olyan Ajyad
