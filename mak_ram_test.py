@@ -14,15 +14,15 @@ from playwright.sync_api import sync_playwright
 import gspread
 
 # ==================== CONFIGURATION ====================
-USERNAME = os.environ.get("BOT_USERNAME", "ai")
-PASSWORD = os.environ.get("BOT_PASSWORD", "")
-WEBSITE_URL = os.environ.get("WEBSITE_URL", "https://bookingarabian.com/")
+USERNAME = os.environ.get("BOT_USERNAME")
+PASSWORD = os.environ.get("BOT_PASSWORD")
+WEBSITE_URL = os.environ.get("WEBSITE_URL")
 
 CITY = "MAKKAH"
 
 # Google Sheets Configuration
 # If GOOGLE_CREDENTIALS_JSON env var is set (GitHub Actions), write it to a temp file
-_creds_json = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
+_creds_json = os.environ.get("GOOGLE_CREDENTIALS_JSON")
 if _creds_json:
     _tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
     _tmp.write(_creds_json)
