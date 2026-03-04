@@ -77,6 +77,20 @@ SOLD_RMS_COLUMN = 4       # Column D - Total Sales goes here
 DATA_START_ROW = 17       # First data row in Google Sheets
 
 
+def sheets_api_call(func, *args, max_retries=3, **kwargs):
+    """Wrapper for Google Sheets API calls with retry on rate limit (429) errors."""
+    for attempt in range(max_retries):
+        try:
+            return func(*args, **kwargs)
+        except gspread.exceptions.APIError as e:
+            if e.response.status_code == 429 and attempt < max_retries - 1:
+                wait_time = 30 * (attempt + 1)  # 30s, 60s, 90s
+                print(f"   ⏳ Rate limited, waiting {wait_time}s before retry ({attempt + 1}/{max_retries})...")
+                time.sleep(wait_time)
+            else:
+                raise
+
+
 def get_sheet_date_ranges():
     """Read each tab from Google Sheets and extract its date range from column B"""
     print("\n📌 Reading Google Sheets to get date ranges...")
@@ -93,19 +107,19 @@ def get_sheet_date_ranges():
     
     for tab_name, website_name in HOTEL_MAPPING.items():
         try:
-            worksheet = spreadsheet.worksheet(tab_name)
+            worksheet = sheets_api_call(spreadsheet.worksheet, tab_name)
         except gspread.exceptions.WorksheetNotFound:
             # Try stripped version
             stripped = tab_name.strip()
             try:
-                worksheet = spreadsheet.worksheet(stripped)
+                worksheet = sheets_api_call(spreadsheet.worksheet, stripped)
             except gspread.exceptions.WorksheetNotFound:
                 print(f"   ⚠️ Tab '{tab_name}' not found in Google Sheets - skipping")
                 continue
         
         # Read ALL values from column B (with rate limit delay)
-        date_col = worksheet.col_values(DATE_COLUMN)
-        time.sleep(2)  # Avoid Google Sheets API rate limit
+        date_col = sheets_api_call(worksheet.col_values, DATE_COLUMN)
+        time.sleep(4)  # Avoid Google Sheets API rate limit
         
         # Scan from row 15 onward, auto-detect where dates start
         dates = []
@@ -258,11 +272,11 @@ def update_google_sheets(sheet_info, hotel_sales_data):
                 continue
             
             try:
-                worksheet = spreadsheet.worksheet(tab_name)
+                worksheet = sheets_api_call(spreadsheet.worksheet, tab_name)
             except gspread.exceptions.WorksheetNotFound:
                 stripped = tab_name.strip()
                 try:
-                    worksheet = spreadsheet.worksheet(stripped)
+                    worksheet = sheets_api_call(spreadsheet.worksheet, stripped)
                 except gspread.exceptions.WorksheetNotFound:
                     print(f"      ⚠️ Tab '{tab_name}' not found in Google Sheets")
                     continue
@@ -287,7 +301,8 @@ def update_google_sheets(sheet_info, hotel_sales_data):
                         continue
             
             if cells_to_update:
-                worksheet.update_cells(cells_to_update)
+                sheets_api_call(worksheet.update_cells, cells_to_update)
+                time.sleep(4)  # Rate limit delay between updates
                 total_updates += len(cells_to_update) // 2
                 print(f"      ✅ Updated {len(cells_to_update) // 2} rows (TOT RMS + SOLD RMS)")
             else:
