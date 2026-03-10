@@ -38,24 +38,24 @@ if not SPREADSHEET_ID:
 # Hotel mapping: Sheet Name -> Website Hotel Name (EXACT unique identifier)
 # Use unique parts of the hotel name to avoid mismatches
 HOTEL_MAPPING = {
-    "SWISSOTEL": "SWISSOTEL MAKKAH",           # Exact match (not AL MAQAM)
-    "SWISS MQM": "SWISSOTEL AL MAQAM",         # Al Maqam version
+    #"SWISSOTEL": "SWISSOTEL MAKKAH",           # Exact match (not AL MAQAM)
+    #"SWISS MQM": "SWISSOTEL AL MAQAM",         # Al Maqam version
     "HAJAR": "MOVENPICK HAJAR TOWER MAKKAH",
     "SAFWA 3": "SAFWA TOWER 3",                 # Safwa Tower
-    "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
+   # "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
     "MAKKAH TWR ": "MAKKAH TOWER",   # Makkah Tower
     " MARRIOT ": "JABAL OMAR MARRIOTT HOTEL MAKKAH",              # Marriot
-    "OLYAN AJY": "AL OLAYAN AJYAD HOTEL",                 # Olyan Ajyad
-    "AZKA MQM": "AZKA AL MAQAM",                # Azka Maqam
-    "AZKA SFA": "AZKA SAFA",                 # Azka Safa
+    #"OLYAN AJY": "AL OLAYAN AJYAD HOTEL",                 # Olyan Ajyad
+   # "AZKA MQM": "AZKA AL MAQAM",                # Azka Maqam
+   # "AZKA SFA": "AZKA SAFA",                 # Azka Safa
     "MIRA AJY": "MIRA AJYAD",                   # Mira Ajyad (not SUDD)
-    "ELAF RYN": "ELAF AL RAYYAN",               # Elaf Rayyan
-    "BARAKA ": "BARAKAH MAWADDAH",              # Barakah
-    "JADA ": "JADA AJIAD HOTEL",                      # Jada Ajyad
+    #"ELAF RYN": "ELAF AL RAYYAN",               # Elaf Rayyan
+    #"BARAKA ": "BARAKAH MAWADDAH",              # Barakah
+   # "JADA ": "JADA AJIAD HOTEL",                      # Jada Ajyad
     "SAJA ": "SAJA MAKKAH",                     # Saja Makkah
     "SAIF ": "SAIF AL MAJD",                    # Saif Al Majd
-    "BADAR": "BADER AL MASSA",                  # Bader Al Massa
-    "VOCO": "VOCO MAKKAH",                      # Voco Makkah
+   # "BADAR": "BADER AL MASSA",                  # Bader Al Massa
+   # "VOCO": "VOCO MAKKAH",                      # Voco Makkah
     "MIRA SD": "MIRA SUDD",                     # Mira Sudd
 }
 
