@@ -66,7 +66,7 @@ HOTEL_MAPPING = {
     #"TAIBAH HILLZ": "TAIBAH HILLS HOTEL",
     "BIR": "BIR",
     "MIRAMAR": "MIRAMAR",
-    "SHAZA": "SHAZA",
+    #"SHAZA": "SHAZA",
     "QADAT": "QADAT",
 }
 
