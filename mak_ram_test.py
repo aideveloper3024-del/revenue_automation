@@ -40,8 +40,8 @@ if not SPREADSHEET_ID:
 HOTEL_MAPPING = {
     "SWISSOTEL": "SWISSOTEL MAKKAH",           # Exact match (not AL MAQAM)
     "SWISS MQM": "SWISSOTEL AL MAQAM",         # Al Maqam version
-    "HAJAR": "MOVENPICK HOTEL & RESIDENCE HAJAR TOWER MAKKAH",
-    "SAFWA 3": "SAFWA TOWER 3",                 # Safwa Tower
+    "HAJAR": "MOVENPICK HAJAR TOWER MAKKAH",
+    "SAFWA 3": "AL SAFWAH HOTEL THIRD TOWER 3",                 # Safwa Tower
     "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
     "MAKKAH TWR ": "MAKKAH TOWER",   # Makkah Tower
     " MARRIOT ": "JABAL OMAR MARRIOTT HOTEL MAKKAH",              # Marriot
