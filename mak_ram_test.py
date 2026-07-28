@@ -4,6 +4,10 @@ Automates copying room availability data from bookingarabian.com to Google Sheet
 Each hotel tab has its own date range - bot fetches data accordingly
 """
 
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
 import time
 import re
 import os
@@ -12,6 +16,12 @@ import tempfile
 from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright
 import gspread
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # ==================== CONFIGURATION ====================
 USERNAME = os.environ.get("BOT_USERNAME")
@@ -35,16 +45,23 @@ SPREADSHEET_ID = os.environ.get("MAK_SPREADSHEET_ID")
 if not SPREADSHEET_ID:
     raise ValueError("MAK_SPREADSHEET_ID environment variable must be set")
 
+# Automatically extract ID if full URL was provided accidentally
+if "docs.google.com" in SPREADSHEET_ID:
+    match = re.search(r'/d/([a-zA-Z0-9-_]+)', SPREADSHEET_ID)
+    if match:
+        SPREADSHEET_ID = match.group(1)
+
 # Hotel mapping: Sheet Name -> Website Hotel Name (EXACT unique identifier)
 # Use unique parts of the hotel name to avoid mismatches
 HOTEL_MAPPING = {
+    "PULLMAN": "PULLMAN ZAMZAM MAKKAH",
     "SWISSOTEL": "SWISSOTEL MAKKAH",           # Exact match (not AL MAQAM)
     "SWISS MQM": "SWISSOTEL AL MAQAM",         # Al Maqam version
     "HAJAR": "MOVENPICK HAJAR TOWER MAKKAH",
     "SAFWA 3": "AL SAFWAH HOTEL THIRD TOWER 3",                 # Safwa Tower
     "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
-    "MAKKAH TWR ": "MAKKAH TOWER",   # Makkah Tower
-    " MARRIOT ": "JABAL OMAR MARRIOTT HOTEL MAKKAH",              # Marriot
+    "MAK TWR": "MAKKAH TOWER",   # Makkah Tower
+    "MARRIOT": "JABAL OMAR MARRIOTT HOTEL MAKKAH",              # Marriot
     "OLYAN AJY": "AL OLAYAN AJYAD HOTEL",                 # Olyan Ajyad
     "AZKA MQM": "AZKA AL MAQAM",                # Azka Maqam
     "AZKA SFA": "AZKA SAFA",                 # Azka Safa
@@ -52,7 +69,7 @@ HOTEL_MAPPING = {
     "ELAF RYN": "ELAF AL RAYYAN",               # Elaf Rayyan
     "BARAKA ": "BARAKAH MAWADDAH",              # Barakah
     "JADA ": "JADA AJIAD HOTEL",                      # Jada Ajyad
-    "SAJA ": "SAJA MAKKAH",                     # Saja Makkah
+    "SAJA MAK": "SAJA MAKKAH",                     # Saja Makkah
     "SAIF ": "SAIF AL MAJD",                    # Saif Al Majd
     "BADAR": "BADER AL MASSA",                  # Bader Al Massa
     "VOCO": "VOCO MAKKAH",                      # Voco Makkah
@@ -79,6 +96,22 @@ def sheets_api_call(func, *args, max_retries=3, **kwargs):
                 time.sleep(wait_time)
             else:
                 raise
+
+
+def parse_date_value(val):
+    for fmt in ['%d-%b-%y', '%d-%b-%Y', '%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d',
+                '%d %b %Y', '%d %b %y', '%m/%d/%Y', '%m/%d/%y',
+                '%d-%B-%y', '%d-%B-%Y', '%B %d, %Y', '%b %d, %Y']:
+        try:
+            parsed_date = datetime.strptime(val, fmt)
+            if parsed_date.year < 100:
+                parsed_date = parsed_date.replace(year=parsed_date.year + 2000)
+            if parsed_date.year == 2025:
+                parsed_date = parsed_date.replace(year=2026)
+            return parsed_date
+        except (ValueError, TypeError):
+            continue
+    return None
 
 
 def get_sheet_date_ranges():
@@ -111,7 +144,51 @@ def get_sheet_date_ranges():
         date_col = sheets_api_call(worksheet.col_values, DATE_COLUMN)
         time.sleep(4)  # Avoid Google Sheets API rate limit
         
-        # Scan from row 15 onward, auto-detect where dates start
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # 1. Scan and delete past dates
+        rows_to_delete = []
+        found_dates = False
+        for row_idx in range(14, len(date_col)):
+            val = date_col[row_idx].strip() if row_idx < len(date_col) else ''
+            if not val:
+                if found_dates:
+                    break
+                continue
+            
+            parsed_date = parse_date_value(val)
+            if parsed_date:
+                found_dates = True
+                if parsed_date < today:
+                    rows_to_delete.append(row_idx + 1)
+            elif found_dates:
+                break
+                
+        if rows_to_delete:
+            print(f"   🗑️ Deleting {len(rows_to_delete)} past date row(s) from {tab_name}...")
+            
+            # FREEZE THE FIRST KEPT ROW to prevent #REF! errors
+            first_kept_row_idx = max(rows_to_delete) + 1
+            try:
+                kept_row_values = sheets_api_call(worksheet.row_values, first_kept_row_idx)
+                if kept_row_values:
+                    cells = sheets_api_call(worksheet.range, first_kept_row_idx, 1, first_kept_row_idx, len(kept_row_values))
+                    for i, cell in enumerate(cells):
+                        cell.value = kept_row_values[i]
+                    sheets_api_call(worksheet.update_cells, cells, value_input_option='USER_ENTERED')
+                    time.sleep(2)
+            except Exception as e:
+                print(f"   ⚠️ Could not freeze row {first_kept_row_idx}: {e}")
+                
+            # Delete from bottom to top to preserve row indices
+            for row in reversed(rows_to_delete):
+                sheets_api_call(worksheet.delete_rows, row)
+                time.sleep(2)
+            # Re-fetch column values after deletion
+            date_col = sheets_api_call(worksheet.col_values, DATE_COLUMN)
+            time.sleep(4)
+        
+        # 2. Extract remaining dates for scraping
         dates = []
         found_dates = False
         for row_idx in range(14, len(date_col)):  # 0-indexed, start from row 15
@@ -123,20 +200,7 @@ def get_sheet_date_ranges():
                     break  # Empty cell after dates = end of data
                 continue
             
-            # Try to parse as date
-            parsed_date = None
-            for fmt in ['%d-%b-%y', '%d-%b-%Y', '%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d',
-                        '%d %b %Y', '%d %b %y', '%m/%d/%Y', '%m/%d/%y',
-                        '%d-%B-%y', '%d-%B-%Y', '%B %d, %Y', '%b %d, %Y']:
-                try:
-                    parsed_date = datetime.strptime(val, fmt)
-                    if parsed_date.year < 100:
-                        parsed_date = parsed_date.replace(year=parsed_date.year + 2000)
-                    if parsed_date.year == 2025:
-                        parsed_date = parsed_date.replace(year=2026)
-                    break
-                except (ValueError, TypeError):
-                    continue
+            parsed_date = parse_date_value(val)
             
             if parsed_date:
                 found_dates = True
