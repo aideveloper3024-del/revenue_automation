@@ -176,7 +176,7 @@ def get_sheet_date_ranges():
                 break
                 
         if rows_to_delete:
-            print(f"   🗑️ Deleting {len(rows_to_delete)} past date row(s) from {tab_name}...")
+            print(f"   🗑️ Deleting cells in {len(rows_to_delete)} past date row(s) from {tab_name} and shifting up...")
             
             # FREEZE THE FIRST KEPT ROW to prevent #REF! errors
             first_kept_row_idx = max(rows_to_delete) + 1
@@ -191,10 +191,32 @@ def get_sheet_date_ranges():
             except Exception as e:
                 print(f"   ⚠️ Could not freeze row {first_kept_row_idx}: {e}")
                 
-            # Delete from bottom to top to preserve row indices
-            for row in reversed(rows_to_delete):
-                sheets_api_call(worksheet.delete_rows, row)
+            # Shift columns A to K up (indices 0 to 11 exclusive)
+            start_row = min(rows_to_delete) - 1
+            end_row = max(rows_to_delete)
+            
+            body = {
+                "requests": [
+                    {
+                        "deleteRange": {
+                            "range": {
+                                "sheetId": worksheet.id,
+                                "startRowIndex": start_row,
+                                "endRowIndex": end_row,
+                                "startColumnIndex": 0,
+                                "endColumnIndex": 11
+                            },
+                            "shiftDimension": "ROWS"
+                        }
+                    }
+                ]
+            }
+            try:
+                sheets_api_call(spreadsheet.batch_update, body)
                 time.sleep(2)
+            except Exception as e:
+                print(f"   ⚠️ Could not shift cells up: {e}")
+                
             # Re-fetch column values after deletion
             date_col = sheets_api_call(worksheet.col_values, DATE_COLUMN)
             time.sleep(4)

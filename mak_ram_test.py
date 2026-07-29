@@ -61,17 +61,17 @@ HOTEL_MAPPING = {
     "SAFWA 3": "AL SAFWAH HOTEL THIRD TOWER 3",                 # Safwa Tower
     "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
     "MAK TWR": "MAKKAH TOWER",   # Makkah Tower
-    "MARRIOT": "JABAL OMAR MARRIOTT HOTEL MAKKAH",              # Marriot
+    "MARRIOT": "MARRIOTT HOTEL JABAL OMAR MAKKAH",              # Marriot
     "OLYAN AJY": "AL OLAYAN AJYAD HOTEL",                 # Olyan Ajyad
     "AZKA MQM": "AZKA AL MAQAM",                # Azka Maqam
-    "AZKA SFA": "AZKA SAFA",                 # Azka Safa
+    "AZKA SFA": "AZKA AL SAFA HOTEL",                 # Azka Safa
     "MIRA AJY": "MIRA AJYAD",                   # Mira Ajyad (not SUDD)
     "ELAF RYN": "ELAF AL RAYYAN",               # Elaf Rayyan
     "BARAKA ": "BARAKAH MAWADDAH",              # Barakah
     "JADA ": "JADA AJIAD HOTEL",                      # Jada Ajyad
     "SAJA MAK": "SAJA MAKKAH",                     # Saja Makkah
     "SAIF ": "SAIF AL MAJD",                    # Saif Al Majd
-    "BADAR": "BADER AL MASSA",                  # Bader Al Massa
+    "BADAR": "AL MASSA BADER HOTEL",                  # Bader Al Massa
     "VOCO": "VOCO MAKKAH",                      # Voco Makkah
     "MIRA SD": "MIRA AL SUDD HOTEL",
     "BILAL": "FUNDUK BILAL",                     # Mira Sudd
@@ -165,7 +165,7 @@ def get_sheet_date_ranges():
                 break
                 
         if rows_to_delete:
-            print(f"   🗑️ Deleting {len(rows_to_delete)} past date row(s) from {tab_name}...")
+            print(f"   🗑️ Deleting cells in {len(rows_to_delete)} past date row(s) from {tab_name} and shifting up...")
             
             # FREEZE THE FIRST KEPT ROW to prevent #REF! errors
             first_kept_row_idx = max(rows_to_delete) + 1
@@ -180,10 +180,32 @@ def get_sheet_date_ranges():
             except Exception as e:
                 print(f"   ⚠️ Could not freeze row {first_kept_row_idx}: {e}")
                 
-            # Delete from bottom to top to preserve row indices
-            for row in reversed(rows_to_delete):
-                sheets_api_call(worksheet.delete_rows, row)
+            # Shift columns A to K up (indices 0 to 11 exclusive)
+            start_row = min(rows_to_delete) - 1
+            end_row = max(rows_to_delete)
+            
+            body = {
+                "requests": [
+                    {
+                        "deleteRange": {
+                            "range": {
+                                "sheetId": worksheet.id,
+                                "startRowIndex": start_row,
+                                "endRowIndex": end_row,
+                                "startColumnIndex": 0,
+                                "endColumnIndex": 11
+                            },
+                            "shiftDimension": "ROWS"
+                        }
+                    }
+                ]
+            }
+            try:
+                sheets_api_call(spreadsheet.batch_update, body)
                 time.sleep(2)
+            except Exception as e:
+                print(f"   ⚠️ Could not shift cells up: {e}")
+                
             # Re-fetch column values after deletion
             date_col = sheets_api_call(worksheet.col_values, DATE_COLUMN)
             time.sleep(4)
