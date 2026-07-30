@@ -165,46 +165,16 @@ def get_sheet_date_ranges():
                 break
                 
         if rows_to_delete:
-            print(f"   🗑️ Deleting cells in {len(rows_to_delete)} past date row(s) from {tab_name} and shifting up...")
+            print(f"   🗑️ Clearing cells in {len(rows_to_delete)} past date row(s) from {tab_name}...")
             
-            # FREEZE THE FIRST KEPT ROW to prevent #REF! errors
-            first_kept_row_idx = max(rows_to_delete) + 1
-            try:
-                kept_row_values = sheets_api_call(worksheet.row_values, first_kept_row_idx)
-                if kept_row_values:
-                    cells = sheets_api_call(worksheet.range, first_kept_row_idx, 1, first_kept_row_idx, len(kept_row_values))
-                    for i, cell in enumerate(cells):
-                        cell.value = kept_row_values[i]
-                    sheets_api_call(worksheet.update_cells, cells, value_input_option='USER_ENTERED')
-                    time.sleep(2)
-            except Exception as e:
-                print(f"   ⚠️ Could not freeze row {first_kept_row_idx}: {e}")
-                
-            # Shift columns A to K up (indices 0 to 11 exclusive)
-            start_row = min(rows_to_delete) - 1
+            start_row = min(rows_to_delete)
             end_row = max(rows_to_delete)
             
-            body = {
-                "requests": [
-                    {
-                        "deleteRange": {
-                            "range": {
-                                "sheetId": worksheet.id,
-                                "startRowIndex": start_row,
-                                "endRowIndex": end_row,
-                                "startColumnIndex": 0,
-                                "endColumnIndex": 11
-                            },
-                            "shiftDimension": "ROWS"
-                        }
-                    }
-                ]
-            }
             try:
-                sheets_api_call(spreadsheet.batch_update, body)
+                sheets_api_call(worksheet.batch_clear, [f"A{start_row}:K{end_row}"])
                 time.sleep(2)
             except Exception as e:
-                print(f"   ⚠️ Could not shift cells up: {e}")
+                print(f"   ⚠️ Could not clear cells: {e}")
                 
             # Re-fetch column values after deletion
             date_col = sheets_api_call(worksheet.col_values, DATE_COLUMN)
