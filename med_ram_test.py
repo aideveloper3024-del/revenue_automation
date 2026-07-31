@@ -255,6 +255,12 @@ def extract_sales_and_allotment(page):
                 }
             }
             
+            // Initialize total arrays with 0 for each date found
+            for (let i = 0; i < result.dates.length; i++) {
+                result.totalSales.push(0);
+                result.totalAllotment.push(0);
+            }
+            
             // Find Total Sales and Total Allotment rows
             const allRows = table.querySelectorAll('tr');
             for (const row of allRows) {
@@ -263,16 +269,28 @@ def extract_sales_and_allotment(page):
                     const label = cells[0].innerText.trim().toUpperCase();
                     
                     if (label.includes('TOTAL SALES') || label === 'TOTAL SALES') {
+                        let dateIndex = 0;
                         for (let i = 1; i < cells.length; i++) {
-                            const num = parseInt(cells[i].innerText.trim());
-                            result.totalSales.push(isNaN(num) ? 0 : num);
+                            if (dateIndex < result.dates.length) {
+                                const num = parseInt(cells[i].innerText.trim());
+                                if (!isNaN(num)) {
+                                    result.totalSales[dateIndex] += num;
+                                }
+                                dateIndex++;
+                            }
                         }
                     }
                     
                     if (label.includes('TOTAL ALLOTMENT') || label === 'TOTAL ALLOTMENT') {
+                        let dateIndex = 0;
                         for (let i = 1; i < cells.length; i++) {
-                            const num = parseInt(cells[i].innerText.trim());
-                            result.totalAllotment.push(isNaN(num) ? 0 : num);
+                            if (dateIndex < result.dates.length) {
+                                const num = parseInt(cells[i].innerText.trim());
+                                if (!isNaN(num)) {
+                                    result.totalAllotment[dateIndex] += num;
+                                }
+                                dateIndex++;
+                            }
                         }
                     }
                 }
