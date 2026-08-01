@@ -53,7 +53,7 @@ if "docs.google.com" in SPREADSHEET_ID:
 
 # Hotel mapping: Google Sheet Tab Name -> Website Hotel Name
 HOTEL_MAPPING = {
-    "AMP": "ANWAR",
+    "AMP": "ANWAR AL MADINAH MOVENPICK ",
     "SAJA": "SAJA MADINAH ",
     "MADEN": "Maden Hotel",
     "AL HARAM": "GRAND MILLENIUM AL HARAM HOTEL",
