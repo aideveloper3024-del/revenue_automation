@@ -235,7 +235,7 @@ def extract_sales_and_allotment(page):
                 if (ths.length > 2) {
                     for (let i = 1; i < ths.length; i++) {
                         const text = ths[i].innerText.trim();
-                        const match = text.match(/(\\d{1,2})-(\\d{1,2})/);
+                        const match = text.match(/(\\d{1,2})[-/](\\d{1,2})/);
                         if (match) {
                             result.dates.push(match[0]);
                         }
@@ -257,7 +257,7 @@ def extract_sales_and_allotment(page):
                 if (cells.length > 1) {
                     const label = cells[0].innerText.trim().toUpperCase();
                     
-                    if (label.includes('TOTAL SALES') || label === 'TOTAL SALES') {
+                    if (label.includes('TOTAL SALE') || label === 'TOTAL SALES') {
                         let dateIndex = 0;
                         for (let i = 1; i < cells.length; i++) {
                             if (dateIndex < result.dates.length) {
@@ -298,7 +298,13 @@ def extract_sales_and_allotment(page):
     current_year = datetime.now().year
     
     for i, date_short in enumerate(dates):
-        parts = date_short.split('-')
+        if '-' in date_short:
+            parts = date_short.split('-')
+        elif '/' in date_short:
+            parts = date_short.split('/')
+        else:
+            continue
+            
         if len(parts) == 2:
             full_date = f"{parts[0]}/{parts[1]}/{current_year}"
             date_value_map[full_date] = {
@@ -353,9 +359,10 @@ def update_google_sheets(sheet_info, hotel_sales_data):
                     try:
                         parts = extracted_date.split('/')
                         if len(parts) == 3:
-                            ext_day = int(parts[0])
-                            ext_month = int(parts[1])
-                            if gs_date.day == ext_day and gs_date.month == ext_month:
+                            ext_part1 = int(parts[0])
+                            ext_part2 = int(parts[1])
+                            if (gs_date.day == ext_part1 and gs_date.month == ext_part2) or \
+                               (gs_date.day == ext_part2 and gs_date.month == ext_part1):
                                 allotment_val = values.get('allotment', 0)
                                 sales_val = values.get('sales', 0)
                                 cells_to_update.append(gspread.Cell(row, TOT_RMS_COLUMN, allotment_val))
