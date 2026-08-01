@@ -60,7 +60,7 @@ HOTEL_MAPPING = {
     "HAJAR": "MOVENPICK HAJAR TOWER MAKKAH",
     "SAFWA 3": "AL SAFWAH HOTEL THIRD TOWER 3",                 # Safwa Tower
     "LE MERIDIEN HTL": "LE MERIDIEN MAKKAH",
-    "MAK TWR": "MAKKAH TOWER",   # Makkah Tower
+    "MAK TWR": "MAKKAH TOWERS",   # Makkah Tower
     "MARRIOT": "MARRIOTT HOTEL JABAL OMAR MAKKAH",              # Marriot
     "OLYAN AJY": "AL OLAYAN AJYAD HOTEL",                 # Olyan Ajyad
     "AZKA MQM": "AZKA AL MAQAM",                # Azka Maqam
@@ -69,12 +69,12 @@ HOTEL_MAPPING = {
     "ELAF RYN": "ELAF AL RAYYAN",               # Elaf Rayyan
     "BARAKA ": "BARAKAH MAWADDAH",              # Barakah
     "JADA ": "JADA AJIAD HOTEL",                      # Jada Ajyad
-    "SAJA MAK": "SAJA MAKKAH",                     # Saja Makkah
+    "SAJA MAK": "SAJA MAKKAH BY WARWICK",                     # Saja Makkah
     "SAIF ": "SAIF AL MAJD",                    # Saif Al Majd
     "BADAR": "AL MASSA BADER HOTEL",                  # Bader Al Massa
     "VOCO": "VOCO MAKKAH",                      # Voco Makkah
-    "MIRA SD": "MIRA AL SUDD HOTEL",
-    "BILAL": "FUNDUK BILAL",                     # Mira Sudd
+    "MIRA SD": "MIRA AL SUDD HOTEL",              # Mira Sudd
+    "BILAL": "FUNDUK BILAL",                     
 }
 
 # Google Sheet structure settings
