@@ -1,7 +1,7 @@
 name: Room Availability Bot
 
 on:
-  schedule:
+ # schedule:
     - cron: '0 5 * * *'
     - cron: '0 10 * * *'
     - cron: '0 16 * * *'
